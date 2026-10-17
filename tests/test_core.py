@@ -151,3 +151,11 @@ def test_end_to_end(tmp_path):
     assert ws["G5"].value == "Y" and ws["M5"].value == "talked to owner, wants quote"
     assert ws["A5"].hyperlink.target.startswith("https://www.google.com/maps/@?api=1&map_action=pano")
     assert ws["C4"].value == "SCORE"
+
+
+def test_job_argv():
+    from fence_scout.job import build_argv
+    a = build_argv({"SCAN_ADDRESS": "6540 Village Springs Dr, Plano, TX 75024"})
+    assert "--dry-run" in a and "--yes" in a and "--print-json" in a
+    b = build_argv({"SCAN_ADDRESS": "x", "SCAN_DRY_RUN": "0", "SCAN_RADIUS": "400"})
+    assert "--dry-run" not in b and b[b.index("--radius") + 1] == "400"
