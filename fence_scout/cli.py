@@ -44,6 +44,8 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--out", default="Fence_Scout_Lead_List.xlsx", help="Excel file to add leads to")
     s.add_argument("--area-name", default="", help='label for the Area / Alley column, e.g. "Kings Ridge alleys"')
     s.add_argument("--scoring", default="scoring.json", help="optional scoring override file")
+    s.add_argument("--print-json", action="store_true",
+                   help="also print each lead as a 'FENCE_LEAD {json}' log line (used when running on Railway)")
     a = p.parse_args(argv)
 
     cfg = load_scoring(a.scoring)
@@ -84,6 +86,10 @@ def main(argv: list[str] | None = None) -> int:
     area = a.area_name or f"Scan near {label.split(',')[0]}"
     print("Grading fences...")
     leads = run_scan(plan, google, grader, cfg, area)
+    if a.print_json:
+        import json
+        for r in leads:
+            print("FENCE_LEAD " + json.dumps(r), flush=True)
 
     out = Path(a.out)
     existing = read_existing(out)
